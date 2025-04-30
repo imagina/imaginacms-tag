@@ -47,7 +47,11 @@ trait TaggableTrait
       $q->from('tag__tagged')
         ->select('tag__tagged.taggable_id')
         ->leftJoin('tag__tag_translations', 'tag__tag_translations.tag_id', '=', 'tag__tagged.tag_id')
-        ->whereIn("tag__tag_translations.$type", $tags);
+        ->where(function ($query) use ($tags, $type) {
+          foreach ($tags as $tag) {
+            $query->orWhere("tag__tag_translations.$type", 'LIKE', "%$tag%");
+          }
+        });
     });
 
     return $query;
